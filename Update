@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapValues</title>
+
+<link rel="icon" type="image/png" sizes="32x32"
+      href="https://i.postimg.cc/76ZQRV6P/Chat-GPT-Image-Dec-27-2025-01-47-45-AM.png">
+
+<link rel="apple-touch-icon"
+      href="https://i.postimg.cc/76ZQRV6P/Chat-GPT-Image-Dec-27-2025-01-47-45-AM.png">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="TapValues">
+<meta property="og:description" content="Tap Simulator Valuelist by NotSpeedGuy and Astarte!">
+<meta property="og:image" content="https://i.postimg.cc/76ZQRV6P/Chat-GPT-Image-Dec-27-2025-01-47-45-AM.png">
+<meta property="og:url" content="https://tap-simulator-valuelist.netlify.app/">
+<meta name="theme-color" content="#6f4cff">
+
+<style>
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  color: #fff;
+
+  /* Cosmic themed background */
+  background:
+    radial-gradient(circle at 20% 20%, rgba(180,120,255,0.15), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(120,80,255,0.12), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(200,120,255,0.10), transparent 50%),
+    linear-gradient(180deg, #0a0712 0%, #120a1f 40%, #09050f 100%);
+
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+h2 { text-align:center; margin-bottom:15px; font-size:24px; letter-spacing:0.5px; }
+.header-note { text-align:center; padding:12px; font-size:14px; color:#9e9e9e; background:#161616; border-bottom:1px solid #222; }
+.tabs { display:flex; justify-content:center; flex-wrap:wrap; background:#171717; padding:10px; border-bottom:1px solid #222; }
+.tab { margin:6px; padding:9px 16px; cursor:pointer; border-radius:6px; background:#272727; font-size:14px; transition:0.2s; user-select:none; }
+.tab:hover { background:#3a3a3a; } .tab.active { background:#4b0082; color:#fff; font-weight:bold; }
+.section { display:none; padding:20px; animation:fade 0.2s ease-in-out; }
+.section.active { display:block; }
+@keyframes fade { from {opacity:0;} to {opacity:1;} }
+
+.pet-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+.pet-card { position:relative; background:#1c1c1c; border-radius:14px; width:220px; padding:14px; text-align:center; border:1px solid #2a2a2a; transition:transform 0.2s; }
+.pet-card:hover { transform:scale(1.03); }
+.pet-card img { width:110px; height:110px; object-fit:contain; margin-bottom:10px; }
+.pet-updated { font-size:11px; color:#9e9e9e; margin-bottom:6px; }
+.pet-name { font-weight:700; margin:4px 0 6px; font-size:16px; }
+
+.pet-row { display:grid; grid-template-columns:1fr 1fr 1fr; padding:8px 0; font-size:13px; border-top:1px solid #2d2d2d; }
+.pet-row:first-of-type { border-top:none; }
+
+.variant-normal { color:#b5b5b5; font-weight:600; }
+.variant-gold { color:#ffd700; font-weight:700; }
+.variant-rainbow { background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:600; }
+
+.value-box { display:flex; flex-direction:column; align-items:center; }
+.value-number { margin-top:3px; font-weight:700; }
+
+.change-up { background:#0f4d00; color:#00ff7d; padding:2px 6px; font-size:10px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+.change-down { background:#4d0000; color:#ff4d4d; padding:2px 6px; font-size:10px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+.change-stable {
+  background: #4d4d00;
+  color: #ffff00;
+  padding: 2px 6px;
+  font-size: 10px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pet-demand { font-weight:700; }
+.demand-red { color:#ff4d4d; }
+.demand-yellow { color:#ffff00; }
+.demand-green { color:#00ff7d; }
+
+.credit { position:fixed; bottom:6px; right:8px; font-size:11px; color:#888; opacity:.8; }
+
+.tooltip { position:absolute; top:6px; right:6px; width:18px; height:18px; background:#000; border-radius:50%; color:#fff; font-size:12px; line-height:18px; text-align:center; cursor:pointer; }
+.tooltip:hover .tooltip-text { visibility:visible; opacity:1; }
+.tooltip-text { visibility:hidden; opacity:0; width:180px; background-color:#222; color:#fff; text-align:left; border-radius:6px; padding:6px; position:absolute; z-index:10; top:24px; right:0; font-size:12px; line-height:1.4; transition:opacity 0.2s; }
+
+.header-note,
+.tabs {
+  background: rgba(20, 12, 35, 0.95); /* more solid = sharper text */
+  border-bottom: 1px solid rgba(140, 90, 255, 0.15);
+}
+
+
+.tab {
+  background: rgba(60, 40, 100, 0.6);
+  border: 1px solid rgba(140, 90, 255, 0.15);
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #6f4cff, #9b6cff);
+  box-shadow: 0 0 14px rgba(140, 90, 255, 0.5);
+}
+
+.pet-card {
+  background: rgba(25, 15, 45, 0.92);
+  border: 1px solid rgba(140, 90, 255, 0.18);
+
+  width: 190px;     /* ⬅ makes card narrower */
+  padding: 20px;    /* ⬅ reduces overall height */
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 0 18px rgba(140, 90, 255, 0.12),
+    inset 0 0 12px rgba(180, 120, 255, 0.05);
+}
+
+
+/* Apply hover effects on mobile tap via active */
+@media (hover: none) {
+  .pet-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  }
+  
+  .pet-card:active {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow:
+      0 0 40px rgba(160, 110, 255, 0.35),
+      0 0 20px rgba(200, 140, 255, 0.25),
+      inset 0 0 18px rgba(200, 140, 255, 0.08);
+    filter: brightness(1.05);
+  }
+}
+
+
+
+h2 {
+  text-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+}
+
+/* ==============================
+   Mobile Responsiveness
+============================== */
+@media (max-width: 768px) {
+  .pet-grid {
+    gap: 12px;
+    justify-content: center;
+  }
+  .pet-name { font-size: 14px; }
+  .pet-row { font-size: 12px; }
+  .value-number { font-size: 14px; }
+  .change-up, .change-down { font-size: 9px; padding: 2px 4px; }
+  h2 { font-size: 20px; }
+
+  .tabs {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+
+  .tab {
+    flex: 1 1 45%; /* easier to tap */
+    text-align: center;
+    padding: 10px 0;
+    font-size: 15px;
+  }
+}
+
+
+/* Default: desktop & large screens */
+body {
+  zoom: 1;
+}
+
+/* Mobile: keep original size */
+@media (max-width: 624px) {
+  body {
+    zoom: 0.44;
+  }
+}
+
+
+</style>
+</head>
+<body>
+
+
+<div class="header-note"><div id="last-updated">Note: Updated UI on mobile. DM NotSpeedGuy for any suggestions!</div></div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchSection(event, 'limitedSecrets')">Limited Secrets</div>
+  <div class="tab" onclick="switchSection(event, 'permanentSecrets')">Permanent Secrets</div>
+  <div class="tab" onclick="switchSection(event, 'leaderboard')">Leaderboard Pets</div>
+  <div class="tab" onclick="switchSection(event, 'currentRobux')">Random Event Pets</div>
+  <div class="tab" onclick="switchSection(event, 'mythicals')">Best Stat Pet</div>
+  <div class="tab" onclick="switchSection(event, 'exclusiveEgg')">Exclusive Eggs</div>
+  <div class="tab" onclick="switchSection(event, 'about')">About Us</div>
+</div>
+
+
+<div id="limitedSecrets" class="section active">
+  <h2>Limited Secrets</h2>
+  <div class="pet-grid" id="limitedSecrets-grid"></div>
+</div>
+<div id="permanentSecrets" class="section">
+  <h2>Permanent Secrets</h2>
+  <div class="pet-grid" id="permanentSecrets-grid"></div>
+</div>
+<div id="leaderboard" class="section">
+  <h2>Leaderboard Pets</h2>
+  <div class="pet-grid" id="leaderboard-grid"></div>
+</div>
+<div id="currentRobux" class="section">
+  <h2>Random Event Pets</h2>
+  <div class="pet-grid" id="currentRobux-grid"></div>
+</div>
+<div id="mythicals" class="section">
+  <h2>Mythicals / Best Stat Pets</h2>
+  <div class="pet-grid" id="mythicals-grid"></div>
+</div>
+<div id="exclusiveEgg" class="section">
+  <h2>Exclusive Eggs</h2>
+  <div class="pet-grid" id="exclusiveEgg-grid"></div>
+</div>
+
+
+<div id="about" class="section">
+  <h2>About Us</h2>
+  <p style="text-align:center; color:#d5d5d5; font-size:15px; line-height:1.6;">
+    Welcome to the Best Tap Simulator Valuelist!<br><br>
+    We are NotSpeedGuy and Astarte, passionate Tap Simulator players. This Valuelist is accurate and updated for all pet trades.<br><br>
+    Contact us on Discord:<br>
+    ⦁ NotSpeedGuy (@notrealzack)<br>
+    ⦁ Astarte (@_astarte)
+  </p>
+</div>
+
+<div class="credit">
+  © 2025 TapValues • Created by NotSpeedGuy & Astarte
+</div>
+
+
+<script>
+function switchSection(event, id) {
+  // Hide all main sections
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  // Update top-level tab active state
+  document.querySelectorAll('.tabs > .tab').forEach(t => t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+const pets = {
+  limitedSecrets: [],
+  permanentSecrets: [],
+  leaderboard: [],
+  limitedRobux: [],
+  currentRobux: [],
+  mythicals: [],
+  exclusiveEgg: []
+};
+
+
+
+function addPet(section, pet) {
+  console.log("Adding pet to section:", section, pet);
+  if(!pets[section]) { console.error("Section not found:", section); return; }
+  pets[section].push(pet);
+  renderPetsForSection(section);
+}
+
+
+function getDemandClass(value) {
+  if(value>=1 && value<=3) return 'demand-red';
+  if(value>=4 && value<=6) return 'demand-yellow';
+  if(value>=7 && value<=10) return 'demand-green';
+  return '';
+}
+
+function renderPetsForSection(section){
+  const grid=document.getElementById(`${section}-grid`);
+  grid.innerHTML="";
+  pets[section].forEach(p=>{
+    const card=document.createElement("div");
+    card.className="pet-card";
+    const normalDemand=getDemandClass(parseInt(p.variants.normal?.demand));
+    const rainbowDemand=getDemandClass(parseInt(p.variants.rainbow?.demand));
+    const goldDemand=getDemandClass(parseInt(p.variants.gold?.demand));
+
+    card.innerHTML=`
+      <div class="pet-updated">Last updated: ${typeof p.updated==="number"?timeAgo(p.updated):p.updated}</div>
+      <img src="${p.img}" alt="${p.name}">
+      <div class="pet-name">${p.name}</div>
+      ${p.description?`<div class="tooltip">? <span class="tooltip-text">${p.description}</span></div>`:""}
+      ${p.variants.normal?`<div class="pet-row">
+        <div class="variant-normal">Normal</div>
+        <div class="value-box">
+          <div class="${
+  p.variants.normal.change === '+'
+    ? 'change-up'
+    : p.variants.normal.change === '='
+    ? 'change-stable'
+    : 'change-down'
+}">
+  ${
+    p.variants.normal.change === '+'
+      ? 'Rising'
+      : p.variants.normal.change === '='
+      ? 'Stable'
+      : 'Dropping'
+  }
+</div>
+
+          <div class="value-number">${p.variants.normal.value}</div>
+        </div>
+        <div class="pet-demand ${normalDemand}">${p.variants.normal.demand}/10</div>
+      </div>`:""}
+      ${p.variants.gold?`<div class="pet-row">
+        <div class="variant-gold">Gold</div>
+        <div class="value-box">
+          <div class="${
+  p.variants.gold.change === '+'
+    ? 'change-up'
+    : p.variants.gold.change === '='
+    ? 'change-stable'
+    : 'change-down'
+}">
+  ${
+    p.variants.gold.change === '+'
+      ? 'Rising'
+      : p.variants.gold.change === '='
+      ? 'Stable'
+      : 'Dropping'
+  }
+</div>
+
+          <div class="value-number">${p.variants.gold.value}</div>
+        </div>
+        <div class="pet-demand ${goldDemand}">${p.variants.gold.demand}/10</div>
+      </div>`:""}
+      ${p.variants.rainbow?`<div class="pet-row">
+        <div class="variant-rainbow">Rainbow</div>
+        <div class="value-box">
+          <div class="${
+  p.variants.rainbow.change === '+'
+    ? 'change-up'
+    : p.variants.rainbow.change === '='
+    ? 'change-stable'
+    : 'change-down'
+}">
+  ${
+    p.variants.rainbow.change === '+'
+      ? 'Rising'
+      : p.variants.rainbow.change === '='
+      ? 'Stable'
+      : 'Dropping'
+  }
+</div>
+
+          <div class="value-number">${p.variants.rainbow.value}</div>
+        </div>
+        <div class="pet-demand ${rainbowDemand}">${p.variants.rainbow.demand}/10</div>
+      </div>`:""}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderAllPets(){
+  for(let section in pets){
+    if(document.getElementById(`${section}-grid`)){
+      renderPetsForSection(section);
+    }
+  }
+}
+
+
+function now(){ return Date.now(); }
+function timeAgo(ts){
+  const seconds=Math.floor((Date.now()-ts)/1000);
+  if(seconds<60)return`${seconds} seconds ago`;
+  const minutes=Math.floor(seconds/60);
+  if(minutes<60)return`${minutes} minute${minutes!==1?'s':''} ago`;
+  const hours=Math.floor(minutes/60);
+  if(hours<24)return`${hours} hour${hours!==1?'s':''} ago`;
+  const days=Math.floor(hours/24);
+  if(days<7)return`${days} day${days!==1?'s':''} ago`;
+  const weeks=Math.floor(days/7);
+  return `${weeks} week${weeks!==1?'s':''} ago`;
+}
+
+/* ===============================
+   ADD PETS BELOW
+=============================== */
+
+addPet('limitedSecrets', {
+  name: "Frosty Snowman",
+  img: "https://i.postimg.cc/dLxtPPD1/snowman.png",
+  description: "Found in the Limited 5M Event Egg. Rarity: 1 in 150,000",
+  updated: now(),
+  variants: {
+    normal: { value: "100", change: "=", demand: "7" },
+    rainbow: { value: "450", change: "=", demand: "8" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "5M North Star",
+  img: "https://i.postimg.cc/zVcXZZ3h/star.png",
+  description: "Found in the Limited 5M Event Egg. Rarity: 1 in 500,000",
+  updated: now(),
+  variants: {
+    normal: { value: "280", change: "=", demand: "8" },
+    rainbow: { value: "1300", change: "=", demand: "8" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "5M Frost Monarch",
+  img: "https://i.postimg.cc/8swz4rSY/monarch.png",
+  description: "Found in the Limited 5M Event Egg. Rarity: 1 in 1,500,000",
+  updated: now(),
+  variants: {
+    normal: { value: "1200", change: "=", demand: "8" },
+    rainbow: { value: "5400", change: "=", demand: "9" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "Frost Spirit",
+  img: "https://i.postimg.cc/56cCfdX9/frost-spitirrrr.png",
+  description: "Found in the Limited Christmas Event Egg. Rarity: 1 in 250,000",
+  updated: now(),
+  variants: {
+    normal: { value: "50", change: "=", demand: "7" },
+    rainbow: { value: "230", change: "=", demand: "7" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "Christmas Tree",
+  img: "https://i.postimg.cc/ct3tfT55/christmas-tree.png",
+  description: "Found in the Limited Christmas Event Egg. Rarity: 1 in 500,000",
+  updated: now(),
+  variants: {
+    normal: { value: "120", change: "=", demand: "7" },
+    rainbow: { value: "550", change: "=", demand: "7" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "Gilded Seraphim",
+  img: "https://i.postimg.cc/8jhr5KvM/seraphim.png",
+  description: "Found in the Limited Christmas Event Egg. Rarity: 1 in 1,750,000",
+  updated: now(),
+  variants: {
+    normal: { value: "800", change: "=", demand: "8" },
+    rainbow: { value: "3600", change: "=", demand: "9" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "2026 Balloons",
+  img: "https://8upload.com/image/a60ddf8525331343/balloon.png",
+  description: "Found in the Limited New Years Event Egg. Rarity: 1 in 500,000",
+  updated: now(),
+  variants: {
+    normal: { value: "85", change: "=", demand: "7" },
+    rainbow: { value: "400", change: "=", demand: "7" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "New Year Dragon",
+  img: "https://8upload.com/image/c25a161a1aa044a2/dragon.png",
+  description: "Found in the Limited New Years Event Egg. Rarity: 1 in 1,000,000",
+  updated: now(),
+  variants: {
+    normal: { value: "350", change: "=", demand: "7" },
+    rainbow: { value: "1600", change: "=", demand: "8" }
+  }
+});
+
+addPet('limitedSecrets', {
+  name: "2026 Overlord",
+  img: "https://8upload.com/image/fc452cccc3817230/overlord.png",
+  description: "Found in the Limited New Years Event Egg. Rarity: 1 in 2,500,000",
+  updated: now(),
+  variants: {
+    normal: { value: "800", change: "=", demand: "8" },
+    rainbow: { value: "3600", change: "=", demand: "9" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Frost Queen",
+  img: "https://i.postimg.cc/0bQ2B25b/queen.png",
+  description: "Rarity: 1 in 100,000",
+  updated: now(),
+  variants: {
+    normal: { value: "25", change: "=", demand: "2" },
+    rainbow: { value: "115", change: "=", demand: "3" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Divine Dragon",
+  img: "https://i.postimg.cc/9zcfyYvr/divine-drag.png",
+  description: "Rarity: 1 in 500,000",
+  updated: now(),
+  variants: {
+    normal: { value: "30", change: "=", demand: "3" },
+    rainbow: { value: "135", change: "=", demand: "3" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Weeping Angel",
+  img: "https://i.postimg.cc/dLxtPPD2/weeping.png",
+  description: "Rarity: 1 in 333,333",
+  updated: now(),
+  variants: {
+    normal: { value: "35", change: "=", demand: "3" },
+    rainbow: { value: "160", change: "=", demand: "3" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Sakura Dominator",
+  img: "https://i.postimg.cc/Yh9qsqrV/sakura.png",
+  description: "Rarity: 1 in 333,333",
+  updated: now(),
+  variants: {
+    normal: { value: "40", change: "=", demand: "3" },
+    rainbow: { value: "180", change: "=", demand: "3" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Raging Claw",
+  img: "https://i.postimg.cc/NLQ0RkWL/claw.png",
+  description: "Rarity: 1 in 1,000,000",
+  updated: now(),
+  variants: {
+    normal: { value: "45", change: "=", demand: "3" },
+    rainbow: { value: "200", change: "=", demand: "3" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Magmasaur",
+  img: "https://i.postimg.cc/Hj3kz7gX/magmasaur.png",
+  description: "Rarity: 1 in 500,000",
+  updated: now(),
+  variants: {
+    normal: { value: "40", change: "=", demand: "3" },
+    rainbow: { value: "180", change: "=", demand: "3" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Candy God",
+  img: "https://i.postimg.cc/ct14ZdQm/candy.png",
+  description: "Rarity: 1 in 250,000",
+  updated: now(),
+  variants: {
+    normal: { value: "40", change: "=", demand: "3" },
+    rainbow: { value: "180", change: "=", demand: "3" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Chocolate Marauder",
+  img: "https://i.postimg.cc/1VR5Pypc/choco.png",
+  description: "Rarity: 1 in 1,000,000",
+  updated: now(),
+  variants: {
+    normal: { value: "65", change: "=", demand: "3" },
+    rainbow: { value: "300", change: "=", demand: "4" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Orca Dominator",
+  img: "https://i.postimg.cc/pykLCnHC/orca.png",
+  description: "Rarity: 1 in 250,000",
+  updated: now(),
+  variants: {
+    normal: { value: "45", change: "=", demand: "3" },
+    rainbow: { value: "200", change: "=", demand: "4" }
+  }
+});
+
+
+addPet('permanentSecrets', {
+  name: "King Kraken",
+  img: "https://i.postimg.cc/c6TLh8SY/kraken.png",
+  description: "Rarity: 1 in 1,000,000",
+  updated: now(),
+  variants: {
+    normal: { value: "160", change: "-", demand: "4" },
+    rainbow: { value: "750", change: "-", demand: "5" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Luminary Star",
+  img: "https://i.postimg.cc/GByD2ZpT/luminary-star-watermarked.png",
+  description: "Rarity: 1 in 250,000",
+  updated: now(),
+  variants: {
+    normal: { value: "100", change: "-", demand: "7" },
+    rainbow: { value: "450", change: "-", demand: "8" }
+  }
+});
+
+addPet('permanentSecrets', {
+  name: "Cosmic Chaos",
+  img: "https://i.postimg.cc/3k6p3KYs/cosmic-star-watermarked.png",
+  description: "Rarity: 1 in 1,000,000",
+  updated: now(),
+  variants: {
+    normal: { value: "400", change: "-", demand: "8" },
+    rainbow: { value: "1800", change: "-", demand: "8" }
+  }
+});
+
+addPet('leaderboard', {
+  name: "OG Top 250",
+  img: "https://i.postimg.cc/5Q9N1fww/250.png",
+  description: "Awarded to the Top 250 Players on the Leaderboard. Limited Now",
+  updated: now(),
+  variants: {
+    normal: { value: "600", change: "+", demand: "8" },
+    rainbow: { value: "2650", change: "+", demand: "9" }
+  }
+});
+
+addPet('leaderboard', {
+  name: "OG Top 100",
+  img: "https://i.postimg.cc/XBN73nw9/100.png",
+  description: "Awarded to the Top 100 Players on the Leaderboard. Limited Now",
+  updated: now(),
+  variants: {
+    normal: { value: "1300", change: "+", demand: "8" },
+    rainbow: { value: "5000", change: "+", demand: "9" }
+  }
+});
+
+addPet('leaderboard', {
+  name: "OG Top 10",
+  img: "https://i.postimg.cc/zbFX9yRD/10.png",
+  description: "Awarded to the Top 10 Players on the Leaderboard. Limited Now",
+  updated: now(),
+  variants: {
+    normal: { value: "13500", change: "+", demand: "9" },
+    rainbow: { value: "O/C", change: "+", demand: "10" }
+  }
+});
+
+addPet('leaderboard', {
+  name: "Top 250",
+  img: "https://8upload.com/image/d5d970cabf198b70/top_250.png",
+  description: "Awarded to the Top 250 Players on the Leaderboard.",
+  updated: now(),
+  variants: {
+    normal: { value: "550", change: "=", demand: "8" },
+    rainbow: { value: "2500", change: "=", demand: "8" }
+  }
+});
+
+addPet('leaderboard', {
+  name: "Top 100",
+  img: "https://8upload.com/image/3b5c0a07efffa9dd/top_100.png",
+  description: "Awarded to the Top 100 Players on the Leaderboard.",
+  updated: now(),
+  variants: {
+    normal: { value: "1250", change: "=", demand: "8" },
+    rainbow: { value: "4800", change: "=", demand: "8" }
+  }
+});
+
+addPet('leaderboard', {
+  name: "Top 10",
+  img: "https://8upload.com/image/dcd03e3b3d3fe07e/top_10.png",
+  description: "Awarded to the Top 10 Players on the Leaderboard.",
+  updated: now(),
+  variants: {
+    normal: { value: "11500", change: "=", demand: "8" },
+    rainbow: { value: "O/C", change: "=", demand: "10" }
+  }
+});
+
+addPet('currentRobux', {
+  name: "Celestial Candycane",
+  img: "https://i.postimg.cc/bSnS1LBc/candy.png",
+  description: "Found in the Limited Santa's OP Gift Event in Store",
+  updated: now(),
+  variants: {
+    normal: { value: "900", change: "+", demand: "8" },
+    rainbow: { value: "4100", change: "+", demand: "9" }
+  }
+});
+
+addPet('currentRobux', {
+  name: "Hooded Krampus",
+  img: "https://i.postimg.cc/0bpJQWSS/hooded.png",
+  description: "Found in the Christmas Spinwheel",
+  updated: now(),
+  variants: {
+    normal: { value: "300", change: "=", demand: "8" },
+    rainbow: { value: "1400", change: "=", demand: "8" }
+  }
+});
+
+addPet('currentRobux', {
+  name: "Disco Lord",
+  img: "https://8upload.com/image/49098f59873d3dc0/disco.png",
+  description: "Found in the Limited New Year Gifts",
+  updated: now(),
+  variants: {
+    normal: { value: "1400", change: "=", demand: "8" },
+    rainbow: { value: "6300", change: "=", demand: "9" }
+  }
+});
+
+addPet('currentRobux', {
+  name: "2026 Star",
+  img: "https://8upload.com/image/22eee9316f221f47/2026_Star.png",
+  description: "Found in the Limited New Years 2026 Freebie Event in Store",
+  updated: now(),
+  variants: {
+    normal: { value: "950", change: "+", demand: "8" },
+    rainbow: { value: "4200", change: "+", demand: "9" }
+  }
+});
+      
+addPet('mythicals', {
+  name: "Starshine Warrior",
+  img: "https://8upload.com/image/409cbe0be76db7be/new_stat.png",
+  description: "Found in the Limited New Years Event Egg. Rarity: 1 in 50,001",
+  updated: now(),
+  variants: {
+    normal: { value: "1.5", change: "=", demand: "7" },
+    gold: { value: "8", change: "=", demand: "8" },   // optional
+    rainbow: { value: "10", change: "=", demand: "9" }
+  }
+});
+
+addPet('exclusiveEgg', {
+  name: "Kairos",
+  img: "https://i.postimg.cc/XXnv9kTC/kairos.png",
+  description: "Found in the Limited Exclusive Chronos Egg. 80% chance",
+  updated: now(),
+  variants: {
+    normal: { value: "100", change: "=", demand: "7" },
+    rainbow: { value: "350", change: "=", demand: "7" }
+  }
+});
+
+addPet('exclusiveEgg', {
+  name: "Paradox",
+  img: "https://i.postimg.cc/RqGZdnBy/paradox.png",
+  description: "Found in the Limited Exclusive Chronos Egg. 19.9% chance",
+  updated: now(),
+  variants: {
+    normal: { value: "130", change: "=", demand: "7" },
+    rainbow: { value: "550", change: "=", demand: "7" }
+  }
+});
+
+addPet('exclusiveEgg', {
+  name: "Chronos",
+  img: "https://i.postimg.cc/SjmKcfwQ/chronos.png",
+  description: "Found in the Limited Exclusive Chronos Egg. 0.1% chance. 36 exist",
+  updated: now(),
+  variants: {
+    normal: { value: "10000", change: "=", demand: "9" },
+    rainbow: { value: "O/C", change: "=", demand: "10" }
+  }
+});
+
+addPet('exclusiveEgg', {
+  name: "Gift Mimic",
+  img: "https://i.postimg.cc/8FkvxRjC/75.png",
+  description: "Found in the Limited Exclusive Krampus Egg",
+  updated: now(),
+  variants: {
+    normal: { value: "40", change: "=", demand: "5" },
+    rainbow: { value: "180", change: "=", demand: "6" }
+  }
+});
+
+addPet('exclusiveEgg', {
+  name: "Snow Thief",
+  img: "https://i.postimg.cc/QK7KcSnv/80.png",
+  description: "Found in the Limited Exclusive Krampus Egg",
+  updated: now(),
+  variants: {
+    normal: { value: "45", change: "=", demand: "5" },
+    rainbow: { value: "200", change: "=", demand: "6" }
+  }
+});
+
+addPet('exclusiveEgg', {
+  name: "Evil Snowman",
+  img: "https://i.postimg.cc/y3R30nrM/90.png",
+  description: "Found in the Limited Exclusive Krampus Egg",
+  updated: now(),
+  variants: {
+    normal: { value: "65", change: "=", demand: "6" },
+    rainbow: { value: "300", change: "=", demand: "7" }
+  }
+});
+
+addPet('exclusiveEgg', {
+  name: "Krampus",
+  img: "https://i.postimg.cc/1fpNtCFP/krampus.png",
+  description: "Found in the Limited Exclusive Krampus Egg",
+  updated: now(),
+  variants: {
+    normal: { value: "2800", change: "+", demand: "8" },
+    rainbow: { value: "O/C", change: "+", demand: "10" }
+  }
+});
+
+
+// Manual time system
+const fixedTime = new Date("2026-01-09T18:18:00Z").getTime();
+for (let section in pets) {
+  pets[section].forEach(p => p.updated = fixedTime);
+}
+
+// Re-render all pets
+renderAllPets();
+
+// Live update "time ago"
+setInterval(() => { 
+  for (let section in pets) renderPetsForSection(section); 
+}, 1000);
+
+</script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
