@@ -49,14 +49,32 @@ h2 { text-align:center; margin-bottom:15px; font-size:24px; letter-spacing:0.5px
 
 .pet-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
 .pet-card { position:relative; background:#1c1c1c; border-radius:14px; width:220px; padding:14px; text-align:center; border:1px solid #2a2a2a; transition:transform 0.2s; }
-.pet-card:hover { transform:scale(1.03); }
-.pet-card img { width:110px; height:110px; object-fit:contain; margin-bottom:10px; }
+.pet-card{
+will-change:transform;
+transition:
+transform .18s,
+box-shadow .18s;
+}
+.pet-card:hover{
+transform:
+translateY(-4px);
+}
+.pet-card img { width:110px; height:110px; object-fit:contain; margin-bottom:10px; opacity:0; transition:opacity .25s;}
+.pet-card img.loaded{ opacity:1;}
 .pet-updated { font-size:11px; color:#9e9e9e; margin-bottom:6px; }
 .pet-name { font-weight:700; margin:4px 0 6px; font-size:16px; }
 
 .pet-row { display:grid; grid-template-columns:1fr 1fr 1fr; padding:8px 0; font-size:13px; border-top:1px solid #2d2d2d; }
 .pet-row:first-of-type { border-top:none; }
-
+.graph-popup{
+opacity:0;
+pointer-events:none;
+transition:.2s;
+}
+.graph-popup.show{
+opacity:1;
+pointer-events:auto;
+}
 .variant-normal { color:#b5b5b5; font-weight:600; }
 .variant-gold { color:#ffd700; font-weight:700; }
 .variant-rainbow { background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:600; }
@@ -174,7 +192,60 @@ body {
 }
 
 
+
+.graph-btn{position:absolute;top:30px;right:6px;width:18px;height:18px;border-radius:50%;background:#6f4cff;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer}.graph-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:9999}.graph-box{background:#171228;padding:20px;border-radius:14px;width:min(700px,90%);position:relative}#closeGraph{position:absolute;right:12px;top:8px;cursor:pointer;font-size:22px}
+
+.gtab{
+flex:1;
+padding:10px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:14px;
+font-weight:700;
+transition:all .25s ease;
+}
+
+.gtab.normal{
+background:#2b2b2b;
+color:#b5b5b5;
+}
+
+.gtab.gold{
+background:#433100;
+color:#ffd700;
+}
+
+.gtab.rainbow{
+background:#29184b;
+background-image:linear-gradient(
+90deg,
+red,
+orange,
+yellow,
+lime,
+cyan,
+blue,
+violet
+);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.gtab:hover{
+transform:translateY(-2px);
+filter:brightness(1.1);
+}
+
+.gtab.active{
+box-shadow:
+0 0 18px rgba(140,90,255,.6);
+}
+
+
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -216,6 +287,27 @@ body {
 </div>
 
 
+<div id="graphPopup" class="graph-popup">
+<div class="graph-box">
+<span id="closeGraph">✖</span>
+<h2 id="graphTitle"></h2>
+<div id="graphTabs" style="display:flex;gap:8px;margin-bottom:10px">
+<button class="gtab normal active"
+onclick="loadGraph('normal')">
+Normal
+</button>
+<button class="gtab gold"
+onclick="loadGraph('gold')">
+Gold
+</button>
+<button class="gtab rainbow"
+onclick="loadGraph('rainbow')">
+Rainbow
+</button>
+</div>
+<canvas id="graphCanvas"></canvas>
+</div>
+</div>
 <script>
 function switchSection(event, id) {
   // Hide all main sections
@@ -262,9 +354,13 @@ function renderPetsForSection(section){
 
     card.innerHTML=`
       <div class="pet-updated">Last updated: ${typeof p.updated==="number"?timeAgo(p.updated):p.updated}</div>
-      <img src="${p.img}" alt="${p.name}">
+      <img
+loading="lazy"
+decoding="async"
+src="${p.img}"
+alt="${p.name}">
       <div class="pet-name">${p.name}</div>
-      ${p.description?`<div class="tooltip">? <span class="tooltip-text">${p.description}</span></div>`:""}
+      ${p.description?`<div class="tooltip">? <span class="tooltip-text">${p.description}</span></div><div class="graph-btn">📈</div>`:"<div class=\"graph-btn\">📈</div>"}
       ${p.variants.normal?`<div class="pet-row">
         <div class="variant-normal">Normal</div>
         <div class="value-box">
@@ -336,6 +432,14 @@ function renderPetsForSection(section){
       </div>`:""}
     `;
     grid.appendChild(card);
+const img=card.querySelector("img");
+img.onload=()=>{
+    img.classList.add("loaded");
+};
+card.querySelector(".graph-btn").onclick=(e)=>{
+    e.stopPropagation();
+    showGraph(p);
+};
   });
 }
 
@@ -360,202 +464,362 @@ function timeAgo(ts){
   if(days<7)return`${days} day${days!==1?'s':''} ago`;
   const weeks=Math.floor(days/7);
   return `${weeks} week${weeks!==1?'s':''} ago`;
+  function updateTimes(){
+    const list=[
+        ...pets.Titanics,
+        ...pets.Huges,
+        ...pets.StatPets
+    ];
+    document.querySelectorAll(".pet-updated")
+        .forEach((element,index)=>{
+            if(list[index]){
+                element.textContent=
+                    "Last updated: "+
+                    timeAgo(list[index].updated);
+            }
+        });
+}
 }
 
 
-addPet('Titanics', {
-  name: "Atlantic Guardian",
-  img: "https://i.postimg.cc/FHs91fVv/atlanta.png",
-  description: "Limited-Time Titanic From Poseidon Egg in Exclusive Shop. 350% as Strong as your Best Pet!",
-  updated: now(),
-  variants: {
-    normal: { value: "55000", change: "+", demand: "10" } ,
-    gold: { value: "120000", change: "+", demand: "10" } ,
-    rainbow: { value: "O/C", change: "+", demand: "10" }
-  }
+
+addPet("Titanics",{
+    name:"Atlantic Guardian",
+    img:"https://i.postimg.cc/FHs91fVv/atlanta.png",
+    description:"Limited-Time Titanic From Poseidon Egg in Exclusive Shop. 350% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"55000",change:"+",demand:"10"},
+        gold:{value:"120000",change:"+",demand:"10"},
+        rainbow:{value:"O/C",change:"+",demand:"10"}
+    },
+    history:{
+        normal:[["26 Jun",55000]],
+        gold:[["26 Jun",120000]],
+        rainbow:[["26 Jun",0]]
+    }
 });
 
-addPet('Titanics', {
-  name: "Partygoer Cat",
-  img: "https://i.postimg.cc/yN1LSZfS/party1.png",
-  description: "Limited-Time Titanic From The Backrooms[Limited Event]. 350% as Strong as your Best Pet!",
-  updated: now(),
-  variants: {
-    normal: { value: "32500", change: "+", demand: "9" } ,
-    gold: { value: "70000", change: "+", demand: "9" } ,
-    rainbow: { value: "O/C", change: "+", demand: "10" }
-  }
+addPet("Titanics",{
+    name:"Partygoer Cat",
+    img:"https://i.postimg.cc/yN1LSZfS/party1.png",
+    description:"Limited-Time Titanic From The Backrooms[Limited Event]. 350% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"32500",change:"+",demand:"9"},
+        gold:{value:"70000",change:"+",demand:"9"},
+        rainbow:{value:"O/C",change:"+",demand:"10"}
+    },
+    history:{
+        normal:[["26 Jun",32500]],
+        gold:[["26 Jun",70000]],
+        rainbow:[["26 Jun",0]]
+    }
 });
 
-addPet('Titanics', {
-  name: "Neon Byte",
-  img: "https://i.postimg.cc/FRnCvHVj/neon.png",
-  description: "Permanent Titanic From Arcade Playzone[World 6]. 300% as Strong as your Best Pet!",
-  updated: now(),
-  variants: {
-    normal: { value: "15000", change: "=", demand: "7" } ,
-    gold: { value: "32500", change: "=", demand: "7" } ,
-    rainbow: { value: "70000", change: "=", demand: "8" }
-  }
+addPet("Titanics",{
+    name:"Neon Byte",
+    img:"https://i.postimg.cc/FRnCvHVj/neon.png",
+    description:"Permanent Titanic From Arcade Playzone[World 6]. 300% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"15000",change:"=",demand:"7"},
+        gold:{value:"32500",change:"=",demand:"7"},
+        rainbow:{value:"70000",change:"=",demand:"8"}
+    },
+    history:{
+        normal:[["26 Jun",15000]],
+        gold:[["26 Jun",32500]],
+        rainbow:[["26 Jun",70000]]
+    }
+});
+
+addPet("Huges",{
+    name:"The Order",
+    img:"https://i.postimg.cc/1z8JHQQs/order.png",
+    description:"250% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"5200",change:"=",demand:"8"},
+        gold:{value:"11500",change:"=",demand:"8"},
+        rainbow:{value:"O/C",change:"+",demand:"10"}
+    },
+    history:{
+        normal:[["26 Jun",5200]],
+        gold:[["26 Jun",11500]],
+        rainbow:[["26 Jun",0]]
+    }
+});
+
+addPet("Huges",{
+    name:"The Omen",
+    img:"https://i.postimg.cc/j5dq9ZMY/omen.png",
+    description:"240% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"3800",change:"+",demand:"8"},
+        gold:{value:"8500",change:"+",demand:"7"},
+        rainbow:{value:"19000",change:"+",demand:"8"}
+    },
+    history:{
+        normal:[["26 Jun",3800]],
+        gold:[["26 Jun",8500]],
+        rainbow:[["26 Jun",19000]]
+    }
+});
+
+addPet("Huges",{
+    name:"Kraken",
+    img:"https://i.postimg.cc/c13YcJtk/kraken.png",
+    description:"225% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"3200",change:"+",demand:"8"},
+        gold:{value:"7000",change:"+",demand:"8"},
+        rainbow:{value:"N/A",change:"+",demand:"9"}
+    },
+    history:{
+        normal:[["26 Jun",3200]],
+        gold:[["26 Jun",7000]],
+        rainbow:[["26 Jun",0]]
+    }
+});
+
+addPet("Huges",{
+    name:"Galaxy Emperor",
+    img:"https://i.postimg.cc/L8xmPzHG/galaxy.png",
+    description:"200% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"2500",change:"=",demand:"7"},
+        gold:{value:"5500",change:"=",demand:"8"},
+        rainbow:{value:"O/C",change:"+",demand:"10"}
+    },
+    history:{
+        normal:[["26 Jun",2500]],
+        gold:[["26 Jun",5500]],
+        rainbow:[["26 Jun",0]]
+    }
+});
+
+addPet("Huges",{
+    name:"Cosmi Bear",
+    img:"https://i.postimg.cc/TwJKZKjx/cosmi-bear.png",
+    description:"175% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"2000",change:"+",demand:"7"},
+        gold:{value:"4500",change:"+",demand:"8"},
+        rainbow:{value:"O/C",change:"+",demand:"10"}
+    },
+    history:{
+        normal:[["26 Jun",2000]],
+        gold:[["26 Jun",4500]],
+        rainbow:[["26 Jun",0]]
+    }
+});
+
+addPet("Huges",{
+    name:"Axolotl",
+    img:"https://i.postimg.cc/JhbVqZmh/axo.png",
+    description:"180% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"1600",change:"=",demand:"7"},
+        gold:{value:"3500",change:"=",demand:"7"},
+        rainbow:{value:"7500",change:"+",demand:"8"}
+    },
+    history:{
+        normal:[["26 Jun",1600]],
+        gold:[["26 Jun",3500]],
+        rainbow:[["26 Jun",7500]]
+    }
+});
+
+addPet("Huges",{
+    name:"Paddinglock",
+    img:"https://i.postimg.cc/FKDt8mf8/paddinglock.png",
+    description:"175% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"1500",change:"+",demand:"7"},
+        gold:{value:"3250",change:"+",demand:"8"},
+        rainbow:{value:"O/C",change:"+",demand:"10"}
+    },
+    history:{
+        normal:[["26 Jun",1500]],
+        gold:[["26 Jun",3250]],
+        rainbow:[["26 Jun",0]]
+    }
+});
+
+addPet("Huges",{
+    name:"Arcade Kitty",
+    img:"https://i.postimg.cc/X7MP2XHW/arcade-kitty.png",
+    description:"175% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"1400",change:"=",demand:"7"},
+        gold:{value:"3000",change:"=",demand:"7"},
+        rainbow:{value:"6500",change:"=",demand:"7"}
+    },
+    history:{
+        normal:[["26 Jun",1400]],
+        gold:[["26 Jun",3000]],
+        rainbow:[["26 Jun",6500]]
+    }
+});
+
+addPet("Huges",{
+    name:"King Doggy",
+    img:"https://i.postimg.cc/d1rfvYDq/king-doggy.png",
+    description:"175% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"1000",change:"=",demand:"6"},
+        gold:{value:"2350",change:"=",demand:"7"},
+        rainbow:{value:"4800",change:"+",demand:"8"}
+    },
+    history:{
+        normal:[["26 Jun",1000]],
+        gold:[["26 Jun",2350]],
+        rainbow:[["26 Jun",4800]]
+    }
+});
+
+addPet("Huges",{
+    name:"Hydra Dominus",
+    img:"https://i.postimg.cc/mDfdm5j3/hydra-dominus.png",
+    description:"150% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"600",change:"-",demand:"6"},
+        gold:{value:"1500",change:"-",demand:"6"},
+        rainbow:{value:"3500",change:"=",demand:"7"}
+    },
+    history:{
+        normal:[["26 Jun",600]],
+        gold:[["26 Jun",1500]],
+        rainbow:[["26 Jun",3500]]
+    }
+});
+
+addPet("Huges",{
+    name:"Nutcracker Squirrel",
+    img:"https://i.postimg.cc/pdY8tcx0/nutcracker-squirrel.png",
+    description:"115% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"300",change:"-",demand:"5"},
+        gold:{value:"650",change:"-",demand:"5"},
+        rainbow:{value:"1350",change:"-",demand:"6"}
+    },
+    history:{
+        normal:[["26 Jun",300]],
+        gold:[["26 Jun",650]],
+        rainbow:[["26 Jun",1350]]
+    }
+});
+
+addPet("StatPets",{
+    name:"Pufferfish",
+    img:"https://i.postimg.cc/j51jVywx/pufferfish.png",
+    description:"Secret Pet with Base Stat x450",
+    updated:now(),
+    variants:{
+        normal:{value:"200",change:"=",demand:"8"},
+        gold:{value:"450",change:"=",demand:"8"},
+        rainbow:{value:"1000",change:"+",demand:"9"}
+    },
+    history:{
+        normal:[["26 Jun",200]],
+        gold:[["26 Jun",450]],
+        rainbow:[["26 Jun",1000]]
+    }
 });
 
 
-addPet('Huges', {
-  name: "The Order",
-  img: "https://i.postimg.cc/1z8JHQQs/order.png",
-  description: "250% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "5200", change: "=", demand: "8" } ,
-    gold: { value: "11500", change: "=", demand: "8" } ,
-    rainbow: { value: "O/C", change: "+", demand: "10" }
-  }
+
+let graphChart=null;
+let currentPet = null;
+function showGraph(p){
+    currentPet=p;
+    const popup=document.getElementById("graphPopup");
+popup.style.display="flex";
+requestAnimationFrame(()=>{
+popup.classList.add("show");
+});
+    document.getElementById("graphTitle").textContent=p.name;
+    document.querySelectorAll(".gtab").forEach(b=>b.classList.remove("active"));
+    document.querySelector(".gtab.normal").classList.add("active");
+    loadGraph("normal");
+}
+
+document.addEventListener('click',e=>{
+const p=document.getElementById('graphPopup');
+if(e.target.id==='closeGraph'||e.target===p){p.style.display='none';if(graphChart){graphChart.destroy();graphChart=null;}}
 });
 
-addPet('Huges', {
-  name: "The Omen",
-  img: "https://i.postimg.cc/j5dq9ZMY/omen.png",
-  description: "240% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "3800", change: "+", demand: "8" } ,
-    gold: { value: "8500", change: "+", demand: "7" } ,
-    rainbow: { value: "19000", change: "+", demand: "8" }
-  }
+function loadGraph(type){
+    if(!currentPet) return;
+    const history=currentPet.history?.[type] || [];
+    const ctx=document
+        .getElementById("graphCanvas")
+        .getContext("2d");
+    if(graphChart){
+        graphChart.destroy();
+    }
+   if(history.length===0){
+
+    alert("No history available.");
+
+    return;
+
+}
+    graphChart=new Chart(ctx,{
+        type:"line",
+        data:{
+            labels:history.map(x=>x[0]),
+            datasets:[{
+                data:history.map(x=>x[1]),
+                borderColor:"#8b5cf6",
+                backgroundColor:"rgba(139,92,246,.2)",
+                fill:true,
+                tension:.35
+            }]
+        },
+     options:{
+    plugins:{
+        legend:{
+            display:false
+        }
+    }
+}
+    });
+    document
+.querySelectorAll(".gtab")
+.forEach(button=>{
+
+button.classList.remove("active");
+
 });
 
-addPet('Huges', {
-  name: "Kraken",
-  img: "https://i.postimg.cc/c13YcJtk/kraken.png",
-  description: "225% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "3200", change: "+", demand: "8" } ,
-    gold: { value: "7000", change: "+", demand: "8" } ,
-    rainbow: { value: "N/A", change: "+", demand: "9" }
-  }
-});
+document
+.querySelector(`.gtab.${type}`)
+.classList.add("active");
+}
 
-addPet('Huges', {
-  name: "Galaxy Emperor",
-  img: "https://i.postimg.cc/L8xmPzHG/galaxy.png",
-  description: "200% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "2500", change: "=", demand: "7" } ,
-    gold: { value: "5500", change: "=", demand: "8" } ,
-    rainbow: { value: "O/C", change: "+", demand: "10" }
-  }
-});
-
-addPet('Huges', {
-  name: "Cosmi Bear",
-  img: "https://i.postimg.cc/TwJKZKjx/cosmi-bear.png",
-  description: "175% as Strong as your Best Pet!",
-  updated: now(),
-  variants: {
-    normal: { value: "2000", change: "+", demand: "7" } ,
-    gold: { value: "4500", change: "+", demand: "8" } ,
-    rainbow: { value: "O/C", change: "+", demand: "10" }
-  }
-});
-
-addPet('Huges', {
-  name: "Axolotl",
-  img: "https://i.postimg.cc/JhbVqZmh/axo.png",
-  description: "180% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "1600", change: "=", demand: "7" } ,
-    gold: { value: "3500", change: "=", demand: "7" } ,
-    rainbow: { value: "7500", change: "+", demand: "8" }
-  }
-});
-
-addPet('Huges', {
-  name: "Paddinglock",
-  img: "https://i.postimg.cc/FKDt8mf8/paddinglock.png",
-  description: "175% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "1500", change: "+", demand: "7" } ,
-    gold: { value: "3250", change: "+", demand: "8" } ,
-    rainbow: { value: "O/C", change: "+", demand: "10" }
-  }
-});
-
-addPet('Huges', {
-  name: "Arcade Kitty",
-  img: "https://i.postimg.cc/X7MP2XHW/arcade-kitty.png",
-  description: "175% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "1400", change: "=", demand: "7" } ,
-    gold: { value: "3000", change: "=", demand: "7" } ,
-    rainbow: { value: "6500", change: "=", demand: "7" }
-  }
-});
-
-
-addPet('Huges', {
-  name: "King Doggy",
-  img: "https://i.postimg.cc/d1rfvYDq/king-doggy.png",
-  description: "175% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "1000", change: "=", demand: "6" } ,
-    gold: { value: "2350", change: "=", demand: "7" } ,
-    rainbow: { value: "4800", change: "+", demand: "8" }
-  }
-});
-
-addPet('Huges', {
-  name: "Hydra Dominus",
-  img: "https://i.postimg.cc/mDfdm5j3/hydra-dominus.png",
-  description: "150% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "600", change: "-", demand: "6" } ,
-    gold: { value: "1500", change: "-", demand: "6" } ,
-    rainbow: { value: "3500", change: "=", demand: "7" }
-  }
-});
-
-addPet('Huges', {
-  name: "Nutcracker Squirrel",
-  img: "https://i.postimg.cc/pdY8tcx0/nutcracker-squirrel.png",
-  description: "115% as Strong as your Best Peet!",
-  updated: now(),
-  variants: {
-    normal: { value: "300", change: "-", demand: "5" } ,
-    gold: { value: "650", change: "-", demand: "5" } ,
-    rainbow: { value: "1350", change: "-", demand: "6" }
-  }
-});
-
-addPet('StatPets', {
-  name: "Pufferfish",
-  img: "https://i.postimg.cc/j51jVywx/pufferfish.png",
-  description: "Secret Pet with Base Stat x450",
-  updated: now(),
-  variants: {
-    normal: { value: "200", change: "=", demand: "8" } ,
-    gold: { value: "450", change: "=", demand: "8" } ,
-    rainbow: { value: "1000", change: "+", demand: "9" }
-  }
-});
-
-
-const fixedTime = new Date("2026-06-26T10:30:00Z").getTime();
+const fixedTime = new Date("2026-06-26T14:15:00Z").getTime();
 for (let section in pets) {
   pets[section].forEach(p => p.updated = fixedTime);
 }
 
 renderAllPets();
 
-setInterval(() => { 
-  for (let section in pets) renderPetsForSection(section); 
-}, 1000);
+document.getElementById("Titanics").classList.add("active");
+document.querySelector(".tab").classList.add("active");
+
+setInterval(updateTimes,1000);
 
 </script>
 </body>
