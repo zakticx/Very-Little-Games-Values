@@ -489,13 +489,13 @@ addPet("Titanics",{
     description:"Limited-Time Titanic From Poseidon Egg in Exclusive Shop. 350% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"50000",change:"+",demand:"10"},
-        gold:{value:"120000",change:"+",demand:"10"},
+        normal:{value:"45000",change:"=",demand:"9"},
+        gold:{value:"100000",change:"=",demand:"10"},
         rainbow:{value:"O/C",change:"+",demand:"10"}
     },
     history:{
-        normal:[["26 Jun",55000]],
-        gold:[["26 Jun",120000]],
+        normal:[["26 Jun",50000] , ["27 Jun",45000]],
+        gold:[["26 Jun",120000] , ["27 Jun",100000]],
         rainbow:[["26 Jun",0]]
     }
 });
@@ -506,8 +506,8 @@ addPet("Titanics",{
     description:"Limited-Time Titanic From The Backrooms[Limited Event]. 350% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"34000",change:"+",demand:"9"},
-        gold:{value:"75000",change:"+",demand:"9"},
+        normal:{value:"34000",change:"-",demand:"8"},
+        gold:{value:"75000",change:"-",demand:"8"},
         rainbow:{value:"O/C",change:"+",demand:"10"}
     },
     history:{
@@ -540,8 +540,8 @@ addPet("Huges",{
     description:"225% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"5500",change:"+",demand:"8"},
-        gold:{value:"12000",change:"+",demand:"8"},
+        normal:{value:"5500",change:"=",demand:"8"},
+        gold:{value:"12000",change:"=",demand:"8"},
         rainbow:{value:"N/A",change:"+",demand:"9"}
     },
     history:{
@@ -574,14 +574,14 @@ addPet("Huges",{
     description:"240% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"3800",change:"+",demand:"8"},
-        gold:{value:"8500",change:"+",demand:"7"},
-        rainbow:{value:"19000",change:"+",demand:"8"}
+        normal:{value:"3000",change:"-",demand:"7"},
+        gold:{value:"7000",change:"-",demand:"7"},
+        rainbow:{value:"16000",change:"-",demand:"8"}
     },
     history:{
-        normal:[["26 Jun",3800]],
-        gold:[["26 Jun",8500]],
-        rainbow:[["26 Jun",19000]]
+        normal:[["26 Jun",3800] , ["27 Jun",3000]],
+        gold:[["26 Jun",8500] , ["27 Jun",7000]],
+        rainbow:[["26 Jun",19000] , ["27 Jun",16000]]
     }
 });
 
@@ -625,14 +625,14 @@ addPet("Huges",{
     description:"180% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"1600",change:"=",demand:"7"},
-        gold:{value:"3500",change:"=",demand:"7"},
-        rainbow:{value:"7500",change:"+",demand:"8"}
+        normal:{value:"2000",change:"=",demand:"8"},
+        gold:{value:"4500",change:"=",demand:"7"},
+        rainbow:{value:"10000",change:"+",demand:"8"}
     },
     history:{
-        normal:[["26 Jun",1600]],
-        gold:[["26 Jun",3500]],
-        rainbow:[["26 Jun",7500]]
+        normal:[["26 Jun",1600] , ["27 Jun",2000]],
+        gold:[["26 Jun",3500] , ["27 Jun",4500]],
+        rainbow:[["26 Jun",7500] , ["27 Jun",10000]]
     }
 });
 
@@ -727,14 +727,14 @@ addPet("StatPets",{
     description:"Secret Pet with Base Stat x450",
     updated:now(),
     variants:{
-        normal:{value:"200",change:"=",demand:"8"},
-        gold:{value:"450",change:"=",demand:"8"},
-        rainbow:{value:"1000",change:"+",demand:"9"}
+        normal:{value:"80",change:"-",demand:"7"},
+        gold:{value:"200",change:"-",demand:"8"},
+        rainbow:{value:"500",change:"-",demand:"9"}
     },
     history:{
-        normal:[["26 Jun",200]],
-        gold:[["26 Jun",450]],
-        rainbow:[["26 Jun",1000]]
+        normal:[["26 Jun",200] , ["27 Jun",80]],
+        gold:[["26 Jun",450] , ["27 Jun",200]],
+        rainbow:[["26 Jun",1000] , ["27 Jun",500]]
     }
 });
 
@@ -809,7 +809,7 @@ document
 .classList.add("active");
 }
 
-const fixedTime = new Date("2026-06-27T12:06:00Z").getTime();
+const fixedTime = new Date("2026-06-27T19:30:00Z").getTime();
 for (let section in pets) {
   pets[section].forEach(p => p.updated = fixedTime);
 }
