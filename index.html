@@ -535,6 +535,23 @@ addPet("Titanics",{
 });
 
 addPet("Huges",{
+    name:"Kraken",
+    img:"https://i.postimg.cc/c13YcJtk/kraken.png",
+    description:"225% as Strong as your Best Pet!",
+    updated:now(),
+    variants:{
+        normal:{value:"5500",change:"+",demand:"8"},
+        gold:{value:"12000",change:"+",demand:"8"},
+        rainbow:{value:"N/A",change:"+",demand:"9"}
+    },
+    history:{
+        normal:[["26 Jun",5500]],
+        gold:[["26 Jun",12000]],
+        rainbow:[["26 Jun",0]]
+    }
+});
+
+addPet("Huges",{
     name:"The Order",
     img:"https://i.postimg.cc/1z8JHQQs/order.png",
     description:"250% as Strong as your Best Pet!",
@@ -565,23 +582,6 @@ addPet("Huges",{
         normal:[["26 Jun",3800]],
         gold:[["26 Jun",8500]],
         rainbow:[["26 Jun",19000]]
-    }
-});
-
-addPet("Huges",{
-    name:"Kraken",
-    img:"https://i.postimg.cc/c13YcJtk/kraken.png",
-    description:"225% as Strong as your Best Pet!",
-    updated:now(),
-    variants:{
-        normal:{value:"5500",change:"+",demand:"8"},
-        gold:{value:"12000",change:"+",demand:"8"},
-        rainbow:{value:"N/A",change:"+",demand:"9"}
-    },
-    history:{
-        normal:[["26 Jun",5500]],
-        gold:[["26 Jun",12000]],
-        rainbow:[["26 Jun",0]]
     }
 });
 
@@ -809,7 +809,7 @@ document
 .classList.add("active");
 }
 
-const fixedTime = new Date("2026-06-27T12:00:00Z").getTime();
+const fixedTime = new Date("2026-06-27T12:06:00Z").getTime();
 for (let section in pets) {
   pets[section].forEach(p => p.updated = fixedTime);
 }
