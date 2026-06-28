@@ -59,6 +59,9 @@ box-shadow .18s;
 transform:
 translateY(-4px);
 }
+.pet-card{
+    position:relative;
+}
 .pet-card img { width:110px; height:110px; object-fit:contain; margin-bottom:10px; opacity:0; transition:opacity .25s;}
 .pet-card img.loaded{ opacity:1;}
 .pet-updated { font-size:11px; color:#9e9e9e; margin-bottom:6px; }
@@ -205,17 +208,14 @@ font-size:14px;
 font-weight:700;
 transition:all .25s ease;
 }
-
 .gtab.normal{
 background:#2b2b2b;
 color:#b5b5b5;
 }
-
 .gtab.gold{
 background:#433100;
 color:#ffd700;
 }
-
 .gtab.rainbow{
 background:#29184b;
 background-image:linear-gradient(
@@ -231,18 +231,152 @@ violet
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 }
-
 .gtab:hover{
 transform:translateY(-2px);
 filter:brightness(1.1);
 }
-
 .gtab.active{
 box-shadow:
 0 0 18px rgba(140,90,255,.6);
 }
+.pet-badge{
+display:inline-block;
+margin:6px auto 10px;
+padding:4px 12px;
+border-radius:999px;
+font-size:11px;
+font-weight:700;
+letter-spacing:.6px;
+text-transform:uppercase;
+}
+.pet-badge.permanent{
+background:rgba(0,255,120,.15);
+color:#37ff8b;
+border:1px solid rgba(55,255,139,.35);
+}
+.pet-badge.limited{
+background:rgba(160,90,255,.15);
+color:#b889ff;
+border:1px solid rgba(184,137,255,.35);
+}
 
+.toolbar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    padding:18px 20px;
+    flex-wrap:wrap;
+}
+.toolbar-btn,
+#sortSelect{
+    text-align: center;
+    text-align-last: center;
+    width:90px;
+    height:42px;
+    border:none;
+    border-radius:10px;
+    background:rgba(35,25,55,.95);
+    color:#fff;
+    font-size:14px;
+    cursor:pointer;
+    transition:.2s;
+    border-radius: 12px;
+}
+.toolbar-btn:hover,
+#sortSelect:hover{
+    background:#6f4cff;
+}
+#searchBox{
+    width:420px;
+    max-width:100%;
+    height:42px;
+    border:none;
+    border-radius:10px;
+    background:rgba(35,25,55,.95);
+    color:white;
+    padding:0 16px;
+    font-size:15px;
+    outline:none;
+}
+#searchBox::placeholder{
+    color:#9f9f9f;
+}
 
+@media (max-width:768px){
+
+.toolbar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:nowrap;
+    padding:12px;
+}
+
+#filterBtn{
+    width:44px;
+    height:44px;
+    padding:0;
+    font-size:18px;
+}
+
+#searchBox{
+    flex:1;
+    min-width:0;
+    width:auto;
+}
+
+#sortSelect{
+    width:44px;
+    height:44px;
+    padding:0;
+    text-align:center;
+    font-size:18px;
+}
+
+}
+
+.filter-wrapper,
+.sort-wrapper{
+    position:relative;
+}
+
+.filter-wrapper{
+    position:relative;
+}
+.filter-menu{
+    display:none;
+    position:absolute;
+    top:48px;
+    left:0;
+    width:180px;
+    background:#1b1630;
+    border:1px solid rgba(140,90,255,.25);
+    border-radius:10px;
+    padding:10px;
+    z-index:999;
+}
+#sortMenu{
+    left:auto;
+    right:0;
+}
+
+.filter-menu.show{
+    display:block;
+}
+.filter-menu label{
+    display:block;
+    padding:6px;
+    cursor:pointer;
+    font-size:14px;
+}
+.filter-menu label:hover{
+    background:#2d2550;
+    border-radius:6px;
+}
+.filter-menu input{
+    margin-right:8px;
+}
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -250,13 +384,76 @@ box-shadow:
 <body>
 
 
-<div class="header-note"><div id="last-updated">Note: Values are averaged from multiple trades, ensuring they are never manipulated and providing a fair and reliable experience!</div></div>
+<div class="header-note"><div id="last-updated">Muscle For Arm Wrestle Value List By Zak</div></div>
 
 <div class="tabs">
   <div class="tab" onclick="switchSection(event, 'Titanics')">Titanics</div>
   <div class="tab" onclick="switchSection(event, 'Huges')">Huges</div>
   <div class="tab" onclick="switchSection(event, 'StatPets')">Stat Pets</div>
   <div class="tab" onclick="switchSection(event, 'about')">About Us</div>
+</div>
+
+<div class="toolbar">
+    <div class="filter-wrapper">
+    <button class="toolbar-btn" id="filterBtn">
+        ⚙ Filter ▼
+    </button>
+
+    <div id="filterMenu" class="filter-menu">
+        <label><input type="checkbox" value="rising"> Rising</label>
+
+        <label><input type="checkbox" value="stable"> Stable</label>
+
+        <label><input type="checkbox" value="dropping"> Dropping</label>
+
+        <label><input type="checkbox" value="demand10"> 10/10 Demand</label>
+    </div>
+</div>
+    <input
+        id="searchBox"
+        type="text"
+        placeholder="🔍 Search pets..."
+    >
+    <div class="sort-wrapper">
+    <button class="toolbar-btn" id="sortBtn">
+        Sort By ▼
+    </button>
+
+    <div id="sortMenu" class="filter-menu">
+
+        <label data-sort="valueDesc">
+            Highest Value
+        </label>
+
+        <label data-sort="valueAsc">
+            Lowest Value
+        </label>
+
+        <label data-sort="demandDesc">
+            Highest Demand
+        </label>
+
+        <label data-sort="demandAsc">
+            Lowest Demand
+        </label>
+
+        <label data-sort="updated">
+            Recently Updated
+        </label>
+
+        <label data-sort="az">
+            A-Z
+        </label>
+
+        <label data-sort="za">
+            Z-A
+        </label>
+
+    </div>
+
+</div>
+    </div>
+</div>
 </div>
 
 
@@ -309,15 +506,24 @@ Rainbow
 </div>
 </div>
 <script>
-function switchSection(event, id) {
-  // Hide all main sections
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+let currentSection = "Titanics";
+function switchSection(event,id){
 
-  // Update top-level tab active state
-  document.querySelectorAll('.tabs > .tab').forEach(t => t.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+    currentSection=id;
+
+    document.querySelectorAll(".section")
+        .forEach(s=>s.classList.remove("active"));
+
+    document.getElementById(id)
+        .classList.add("active");
+
+    document.querySelectorAll(".tabs>.tab")
+        .forEach(t=>t.classList.remove("active"));
+
+    event.currentTarget.classList.add("active")
 }
+
+
 
 const pets = {
   Titanics: [],
@@ -359,7 +565,14 @@ loading="lazy"
 decoding="async"
 src="${p.img}"
 alt="${p.name}">
-      <div class="pet-name">${p.name}</div>
+      <div class="pet-title">
+    <div class="pet-name">${p.name}</div>
+
+   ${p.badge?`
+<div class="pet-badge ${p.badge.toLowerCase()}">
+    ${p.badge}
+</div>
+`:""}
       ${p.description?`<div class="tooltip">? <span class="tooltip-text">${p.description}</span></div><div class="graph-btn">📈</div>`:"<div class=\"graph-btn\">📈</div>"}
       ${p.variants.normal?`<div class="pet-row">
         <div class="variant-normal">Normal</div>
@@ -454,17 +667,22 @@ function renderAllPets(){
 
 function now(){ return Date.now(); }
 function timeAgo(ts){
-  const seconds=Math.floor((Date.now()-ts)/1000);
-  if(seconds<60)return`${seconds} seconds ago`;
-  const minutes=Math.floor(seconds/60);
-  if(minutes<60)return`${minutes} minute${minutes!==1?'s':''} ago`;
-  const hours=Math.floor(minutes/60);
-  if(hours<24)return`${hours} hour${hours!==1?'s':''} ago`;
-  const days=Math.floor(hours/24);
-  if(days<7)return`${days} day${days!==1?'s':''} ago`;
-  const weeks=Math.floor(days/7);
-  return `${weeks} week${weeks!==1?'s':''} ago`;
-  function updateTimes(){
+    const seconds=Math.floor((Date.now()-ts)/1000);
+    if(seconds<60)
+        return `${seconds} seconds ago`;
+    const minutes=Math.floor(seconds/60);
+    if(minutes<60)
+        return `${minutes} minute${minutes!==1?"s":""} ago`;
+    const hours=Math.floor(minutes/60);
+    if(hours<24)
+        return `${hours} hour${hours!==1?"s":""} ago`;
+    const days=Math.floor(hours/24);
+    if(days<7)
+        return `${days} day${days!==1?"s":""} ago`;
+    const weeks=Math.floor(days/7);
+    return `${weeks} week${weeks!==1?"s":""} ago`;
+}
+function updateTimes(){
     const list=[
         ...pets.Titanics,
         ...pets.Huges,
@@ -479,7 +697,6 @@ function timeAgo(ts){
             }
         });
 }
-}
 
 
 
@@ -490,7 +707,7 @@ addPet("Titanics",{
     updated:now(),
     variants:{
         normal:{value:"45000",change:"=",demand:"9"},
-        gold:{value:"100000",change:"=",demand:"10"},
+        gold:{value:"100000",change:"=",demand:"9"},
         rainbow:{value:"O/C",change:"+",demand:"10"}
     },
     history:{
@@ -506,14 +723,14 @@ addPet("Titanics",{
     description:"Limited-Time Titanic From The Backrooms[Limited Event]. 350% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"34000",change:"-",demand:"8"},
-        gold:{value:"75000",change:"-",demand:"8"},
-        rainbow:{value:"O/C",change:"+",demand:"10"}
+        normal:{value:"31000",change:"-",demand:"8"},
+        gold:{value:"68000",change:"-",demand:"8"},
+        rainbow:{value:"150000",change:"-",demand:"9"}
     },
     history:{
-        normal:[["26 Jun",32500] , ["27 Jun",34000]],
-        gold:[["26 Jun",70000] , ["27 Jun",75000]],
-        rainbow:[["26 Jun",0]]
+        normal:[["26 Jun",32500] , ["27 Jun",34000] , ["28 Jun",31000]],
+        gold:[["26 Jun",70000] , ["27 Jun",75000] , ["28 Jun",68000]],
+        rainbow:[["28 Jun",150000]]
     }
 });
 
@@ -574,14 +791,14 @@ addPet("Huges",{
     description:"240% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"3000",change:"-",demand:"7"},
-        gold:{value:"7000",change:"-",demand:"7"},
-        rainbow:{value:"16000",change:"-",demand:"8"}
+        normal:{value:"2800",change:"-",demand:"7"},
+        gold:{value:"6500",change:"-",demand:"7"},
+        rainbow:{value:"15000",change:"-",demand:"8"}
     },
     history:{
-        normal:[["26 Jun",3800] , ["27 Jun",3000]],
-        gold:[["26 Jun",8500] , ["27 Jun",7000]],
-        rainbow:[["26 Jun",19000] , ["27 Jun",16000]]
+        normal:[["26 Jun",3800] , ["27 Jun",3000] , ["28 Jun",2800]],
+        gold:[["26 Jun",8500] , ["27 Jun",7000] , ["28 Jun",6500]],
+        rainbow:[["26 Jun",19000] , ["27 Jun",16000] , ["28 Jun",15000]]
     }
 });
 
@@ -630,9 +847,9 @@ addPet("Huges",{
         rainbow:{value:"10000",change:"+",demand:"8"}
     },
     history:{
-        normal:[["26 Jun",1600] , ["27 Jun",2000]],
-        gold:[["26 Jun",3500] , ["27 Jun",4500]],
-        rainbow:[["26 Jun",7500] , ["27 Jun",10000]]
+        normal:[["26 Jun",1600],["27 Jun",2000]],
+        gold:[["26 Jun",3500],["27 Jun",4500]],
+        rainbow:[["26 Jun",7500],["27 Jun",10000]]
     }
 });
 
@@ -739,7 +956,6 @@ addPet("StatPets",{
 });
 
 
-
 let graphChart=null;
 let currentPet = null;
 function showGraph(p){
@@ -809,17 +1025,198 @@ document
 .classList.add("active");
 }
 
-const fixedTime = new Date("2026-06-27T19:30:00Z").getTime();
+const fixedTime = new Date("2026-06-28T20:30:00Z").getTime();
 for (let section in pets) {
   pets[section].forEach(p => p.updated = fixedTime);
 }
 
-renderAllPets();
+function applyFilters(){
 
+    const query=document
+        .getElementById("searchBox")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const filters=[
+        ...document.querySelectorAll("#filterMenu input:checked")
+    ].map(x=>x.value);
+
+    const cards=document
+        .getElementById(`${currentSection}-grid`)
+        .querySelectorAll(".pet-card");
+
+    cards.forEach(card=>{
+
+        const name=card
+            .querySelector(".pet-name")
+            .textContent
+            .toLowerCase();
+
+        const text=card.textContent.toLowerCase();
+
+        let show=name.includes(query);
+
+        if(show && filters.includes("rising") && !text.includes("rising"))
+            show=false;
+
+        if(show && filters.includes("stable") && !text.includes("stable"))
+            show=false;
+
+        if(show && filters.includes("dropping") && !text.includes("dropping"))
+            show=false;
+
+        if(show && filters.includes("demand10") && !text.includes("10/10"))
+            show=false;
+
+        card.style.display=show ? "" : "none";
+
+    });
+
+}
+
+const sortBtn=document.getElementById("sortBtn");
+const sortMenu=document.getElementById("sortMenu");
+
+sortBtn.onclick=()=>{
+    sortMenu.classList.toggle("show");
+};
+
+document.addEventListener("click",(e)=>{
+    if(
+        !sortMenu.contains(e.target) &&
+        !sortBtn.contains(e.target)
+    ){
+        sortMenu.classList.remove("show");
+    }
+});
+
+
+let currentSort = "";
+function sortPets(){
+
+    const sort = currentSort;
+    const list = pets[currentSection];
+
+    switch(sort){
+        case "valueDesc":
+            list.sort((a,b)=>
+                (parseInt(b.variants.normal.value)||0)-
+                (parseInt(a.variants.normal.value)||0)
+            );
+            break;
+        case "valueAsc":
+            list.sort((a,b)=>
+                (parseInt(a.variants.normal.value)||0)-
+                (parseInt(b.variants.normal.value)||0)
+            );
+            break;
+        case "demandDesc":
+            list.sort((a,b)=>
+                (parseInt(b.variants.normal.demand)||0)-
+                (parseInt(a.variants.normal.demand)||0)
+            );
+            break;
+        case "demandAsc":
+            list.sort((a,b)=>
+                (parseInt(a.variants.normal.demand)||0)-
+                (parseInt(b.variants.normal.demand)||0)
+            );
+            break;
+        case "updated":
+            list.sort((a,b)=>b.updated-a.updated);
+            break;
+        case "az":
+            list.sort((a,b)=>a.name.localeCompare(b.name));
+            break;
+        case "za":
+            list.sort((a,b)=>b.name.localeCompare(a.name));
+            break;
+    }
+    renderPetsForSection(currentSection);
+    applyFilters();
+
+}
+
+renderAllPets();
+document
+.getElementById("searchBox")
+.addEventListener("input",applyFilters);
 document.getElementById("Titanics").classList.add("active");
 document.querySelector(".tab").classList.add("active");
-
 setInterval(updateTimes,1000);
+
+const filterBtn=document.getElementById("filterBtn");
+const filterMenu=document.getElementById("filterMenu");
+sortBtn.onclick = () => {
+    sortMenu.classList.toggle("show");
+};
+document
+.querySelectorAll("#sortMenu label")
+.forEach(label=>{
+
+    label.onclick=()=>{
+
+        currentSort = label.dataset.sort;
+
+        sortBtn.innerHTML =
+            "⇅ " + label.textContent + " ▼";
+
+        sortMenu.classList.remove("show");
+
+        sortPets();
+
+    };
+
+});
+
+
+function updateMobileUI(){
+
+    if(window.innerWidth <= 768){
+
+        filterBtn.innerHTML = "⚙";
+        sortBtn.innerHTML = "⇅";
+
+    }else{
+
+        filterBtn.innerHTML = "⚙ Filter ▼";
+
+        if(currentSort=="")
+            sortBtn.innerHTML="⇅ Sort ▼";
+    }
+
+}
+
+
+updateMobileUI();
+window.addEventListener("resize", updateMobileUI);
+
+filterBtn.onclick=()=>{
+    filterMenu.classList.toggle("show");
+};
+document.addEventListener("click",(e)=>{
+
+    if(
+        !filterMenu.contains(e.target) &&
+        !filterBtn.contains(e.target)
+    ){
+        filterMenu.classList.remove("show");
+    }
+
+    if(
+        !sortMenu.contains(e.target) &&
+        !sortBtn.contains(e.target)
+    ){
+        sortMenu.classList.remove("show");
+    }
+
+});
+document
+.querySelectorAll("#filterMenu input")
+.forEach(box=>{
+    box.addEventListener("change",applyFilters);
+});
 
 </script>
 </body>
