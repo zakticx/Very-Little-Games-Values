@@ -810,14 +810,14 @@ addPet("Titanics",{
     description:"Permanent Titanic From Arcade Playzone[World 6]. 300% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"16000",change:"+",demand:"7"},
-        gold:{value:"35000",change:"+",demand:"7"},
-        rainbow:{value:"80000",change:"+",demand:"8"}
+        normal:{value:"16500",change:"+",demand:"7"},
+        gold:{value:"36500",change:"+",demand:"7"},
+        rainbow:{value:"82000",change:"+",demand:"8"}
     },
     history:{
-        normal:[["26 Jun",15000] , ["27 Jun",16000]],
-        gold:[["26 Jun",32500] , ["27 Jun",35000]],
-        rainbow:[["26 Jun",70000] , ["27 Jun",80000]]
+        normal:[["26 Jun",15000] , ["27 Jun",16000] , ["27 Jun",16500]],
+        gold:[["26 Jun",32500] , ["27 Jun",35000] , ["27 Jun",36500]],
+        rainbow:[["26 Jun",70000] , ["27 Jun",80000] , ["27 Jun",82000]]
     }
 });
 
@@ -861,12 +861,12 @@ addPet("Huges",{
     description:"240% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"2500",change:"-",demand:"7"},
+        normal:{value:"2200",change:"-",demand:"7"},
         gold:{value:"5500",change:"-",demand:"7"},
         rainbow:{value:"13000",change:"-",demand:"8"}
     },
     history:{
-        normal:[["26 Jun",3800] , ["27 Jun",3000] , ["28 Jun",2800] , ["29 Jun",2500]],
+        normal:[["26 Jun",3800] , ["27 Jun",3000] , ["28 Jun",2800] , ["29 Jun",2200]],
         gold:[["26 Jun",8500] , ["27 Jun",7000] , ["28 Jun",6500] , ["29 Jun",5500]],
         rainbow:[["26 Jun",19000] , ["27 Jun",16000] , ["28 Jun",15000] , ["29 Jun",13000]]
     }
@@ -1095,7 +1095,7 @@ document
 .classList.add("active");
 }
 
-const fixedTime = new Date("2026-06-29T09:23:00Z").getTime();
+const fixedTime = new Date("2026-06-29T12:43:00Z").getTime();
 for (let section in pets) {
   pets[section].forEach(p => p.updated = fixedTime);
 }
