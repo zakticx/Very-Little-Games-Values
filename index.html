@@ -768,12 +768,12 @@ addPet("Huges",{
     variants:{
         normal:{value:"5500",change:"=",demand:"8"},
         gold:{value:"12000",change:"=",demand:"8"},
-        rainbow:{value:"N/A",change:"+",demand:"9"}
+        rainbow:{value:"30000",change:"+",demand:"9"}
     },
     history:{
         normal:[["26 Jun",5500]],
         gold:[["26 Jun",12000]],
-        rainbow:[["26 Jun",0]]
+        rainbow:[["26 Jun",0] , ["29 Jun",30000]]
     }
 });
 
@@ -1034,7 +1034,7 @@ document
 .classList.add("active");
 }
 
-const fixedTime = new Date("2026-06-29T08:17:00Z").getTime();
+const fixedTime = new Date("2026-06-29T08:36:00Z").getTime();
 for (let section in pets) {
   pets[section].forEach(p => p.updated = fixedTime);
 }
