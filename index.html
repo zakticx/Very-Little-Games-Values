@@ -416,16 +416,13 @@ border:1px solid rgba(184,137,255,.35);
 
 @keyframes cosmicPulse{
     0%,100%{
-        filter:
-            drop-shadow(0 0 3px #8f7cff)
-            drop-shadow(0 0 6px #8f7cff);
+        text-shadow:0 0 1px #8f7cff;
     }
 
     50%{
-        filter:
-            drop-shadow(0 0 8px #ffffff)
-            drop-shadow(0 0 16px #8f7cff)
-            drop-shadow(0 0 28px #6fdcff);
+        text-shadow:
+            0 0 2px #ffffff,
+            0 0 3px #8f7cff;
     }
 }
 
@@ -813,9 +810,9 @@ addPet("Titanics",{
     description:"Permanent Titanic From Arcade Playzone[World 6]. 300% as Strong as your Best Pet!",
     updated:now(),
     variants:{
-        normal:{value:"16000",change:"=",demand:"7"},
-        gold:{value:"35000",change:"=",demand:"7"},
-        rainbow:{value:"80000",change:"=",demand:"8"}
+        normal:{value:"16000",change:"+",demand:"7"},
+        gold:{value:"35000",change:"+",demand:"7"},
+        rainbow:{value:"80000",change:"+",demand:"8"}
     },
     history:{
         normal:[["26 Jun",15000] , ["27 Jun",16000]],
@@ -1098,7 +1095,7 @@ document
 .classList.add("active");
 }
 
-const fixedTime = new Date("2026-06-29T09:14:00Z").getTime();
+const fixedTime = new Date("2026-06-29T09:23:00Z").getTime();
 for (let section in pets) {
   pets[section].forEach(p => p.updated = fixedTime);
 }
